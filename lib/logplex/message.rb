@@ -1,5 +1,6 @@
 require 'valcro'
 require 'time'
+require 'logplex/configuration'
 
 module Logplex
   class Message
@@ -29,6 +30,8 @@ module Logplex
     def validate
       super
       errors.add(:message, "too long") if @message.length > 10240
+      errors.add(:process, "can't be nil") if @process.nil?
+      errors.add(:host, "can't be nil") if @host.nil?
     end
 
   private

@@ -2,6 +2,7 @@ require 'spec_helper'
 require 'logplex/message'
 
 describe Logplex::Message do
+  before { Logplex.configure { |conf| } }
   it 'fills out fields of a syslog message' do
     message = Logplex::Message.new(
       'my message here',
@@ -18,12 +19,25 @@ describe Logplex::Message do
   end
 
   it 'is invalid for messages longer than 10240 bytes' do
-    short = Logplex::Message.new('a' * 10240, token: 'foo')
-    long = Logplex::Message.new('a' * 10241, token: 'foo')
+    short = Logplex::Message.new('a' * 10240, token:   'foo',
+                                              process: 'proc',
+                                              host:    'host')
+    long  = Logplex::Message.new('a' * 10241, token: 'foo',
+                                              process: 'proc',
+                                              host:    'host')
     short.validate
     long.validate
 
     expect(short.valid?).to be_true
     expect(long.valid?).to be_false
+  end
+
+  it 'is invalid with no process or host' do
+    message = Logplex::Message.new("a message", token: 't.some-token')
+    message.validate
+
+    expect(message.valid?).to be_false
+    expect(message.errors[:process]).to eq ["can't be nil"]
+    expect(message.errors[:host]).to eq ["can't be nil"]
   end
 end
