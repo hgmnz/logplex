@@ -34,6 +34,11 @@ describe Logplex::Message do
   end
 
   it 'is invalid with no process or host' do
+    Logplex.configure do |conf|
+      conf.host    = nil
+      conf.process = nil
+    end
+
     message = Logplex::Message.new("a message", token: 't.some-token')
     message.validate
 

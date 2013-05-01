@@ -6,6 +6,7 @@ module Logplex
 
     def initialize
       @logplex_url = 'https://east.logplex.io'
+      @host        = 'localhost'
     end
   end
 
