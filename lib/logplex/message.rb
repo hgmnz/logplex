@@ -1,4 +1,6 @@
 require 'valcro'
+require 'time'
+
 module Logplex
   class Message
     include Valcro
