@@ -1,6 +1,8 @@
 module Logplex
   class Configuration
-    attr_accessor :logplex_url
+    attr_accessor :logplex_url,
+      :process,
+      :host
 
     def initialize
       @logplex_url = 'https://east.logplex.io'

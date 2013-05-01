@@ -6,6 +6,11 @@ require 'support/fake_logplex'
 describe Logplex::Publisher, '#publish' do
   before do
     ShamRack.mount(FakeLogplex.new, 'logplex.example.com', 443)
+
+    Logplex.configure do |config|
+      config.process = "postgres"
+      config.host = "host"
+    end
   end
 
   after do

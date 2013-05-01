@@ -15,8 +15,8 @@ module Logplex
       @message   = message
       @token      = opts.fetch(:token)
       @time       = opts[:time] || DateTime.now
-      @process    = opts[:process] || 'postgres'
-      @host       = opts[:host] || 'postgres'
+      @process    = opts[:process] || Logplex.configuration.process
+      @host       = opts[:host] || Logplex.configuration.host
       @message_id = opts[:message_id] || FIELD_DISABLED
     end
 
