@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = Logplex::VERSION
   gem.authors       = ["Harold Giménez"]
   gem.email         = ["harold.gimenez@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{Publish and Consume Logplex messages}
+  gem.summary       = %q{Publish and Consume Logplex messages}
+  gem.homepage      = "https://practiceovertheory.com"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
