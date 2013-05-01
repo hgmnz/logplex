@@ -16,7 +16,7 @@ module Logplex
       messages.each(&:validate)
       if messages.inject(true) { |accum, m| m.valid? }
         api_post(
-          messages.map(&:syslog_encode).join('')
+          messages.map(&:syslog_frame).join('')
         )
       end
     end

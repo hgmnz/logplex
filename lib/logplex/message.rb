@@ -20,7 +20,7 @@ module Logplex
       @message_id = opts[:message_id] || FIELD_DISABLED
     end
 
-    def syslog_encode
+    def syslog_frame
       temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@token} #{@process} #{@message_id} #{FIELD_DISABLED} #{@message}"
       length = temp.length
       "#{length} #{temp}"
