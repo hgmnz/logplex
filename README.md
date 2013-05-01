@@ -25,6 +25,23 @@ publisher.publish [ "And as we wind on down the road",
 
 TBD
 
+## Configuration
+
+You can configure default values for logplex message posting:
+
+```ruby
+Logplex.configure do |config|
+  config.logplex_url = 'https://logplex.example.com'
+end
+```
+
+In the example above, it is now not not necessary to
+specify a logplex URL when getting a hold of a publisher:
+
+```ruby
+publisher = Logplex::Publisher.new(logplex_token)
+```
+
 ### License
 
 Copyright (c) Harold Giménez. Released under the terms of the MIT License found in the LICENSE file.
