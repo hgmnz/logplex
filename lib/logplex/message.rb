@@ -22,7 +22,7 @@ module Logplex
     end
 
     def syslog_frame
-      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@token} #{@process} #{@message_id} #{FIELD_DISABLED} #{@message}"
+      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@token} #{@process} #{@message_id} #{FIELD_DISABLED} #{formatted_message}"
       length = temp.length
       "#{length} #{temp}"
     end
@@ -43,5 +43,16 @@ module Logplex
         @time.to_datetime.rfc3339
       end
     end
+
+    def formatted_message
+      if @message.kind_of?(Hash)
+        @message.inject([]) do |res, (key, value)|
+          res << %{#{key}="#{value}"}
+        end.join(' ')
+      else
+        @message
+      end
+    end
+
   end
 end

@@ -41,4 +41,18 @@ describe Logplex::Message do
     expect(message.errors[:process]).to eq ["can't be nil"]
     expect(message.errors[:host]).to eq ["can't be nil"]
   end
+
+  it 'formats logs as key/values when given a hash' do
+    message = Logplex::Message.new(
+      { vocals: 'Robert Plant', guitar: 'Jimmy Page' },
+      token: 't.some-token',
+      process: 'proc',
+      host:    'host',
+      time: DateTime.parse("1980-08-23 05:31 00:00")
+    )
+
+    expect(message.syslog_frame).to eq(
+      %{101 <134>1 1980-08-23T05:31:00+00:00 host t.some-token proc - - vocals="Robert Plant" guitar="Jimmy Page"}
+    )
+  end
 end

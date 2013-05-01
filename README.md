@@ -22,6 +22,14 @@ publisher.publish [ "And as we wind on down the road",
                     "Who shines white light and wants to show"]
 ```
 
+The message can also be passed in the form of a Hash, in which case it is
+formatted as machine readble key/value pairs suitable for metrics collection,
+eg: [log2viz](https://blog.heroku.com/archives/2013/3/19/log2viz)
+
+```ruby
+publisher.publish { vocals: 'Robert Plant', guitar: 'Jimmy Page' }
+# produces the message: vocals='Robert Plant' guitar='Jimmy Page'
+```
 ### Consumnig messages
 
 TBD
