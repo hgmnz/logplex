@@ -12,7 +12,7 @@ class FakeLogplex
       messages = []
       anchor = 0
       until anchor >= syslog_message.length
-        new_anchor, opts = extract_message(syslog_message, anchor)
+        new_anchor, opts = extract_syslog_field(syslog_message, anchor)
         raise "same" if anchor == new_anchor
         anchor = new_anchor
         messages << new(opts)
@@ -20,42 +20,35 @@ class FakeLogplex
       messages
     end
 
-    def self.extract_message(syslog_message, anchor)
-      start = anchor
-      pos = start
-      until (char = syslog_message[pos+=1] and char == ' ') || pos >= syslog_message.length
-        bytes = syslog_message[anchor..pos].to_i
-      end
-      anchor = pos+=1
-      until (char = syslog_message[pos+=1] and char == ' ') || pos >= syslog_message.length
-        facility_and_priority = syslog_message[anchor..pos]
-      end
-      anchor = pos+1
-      until (char = syslog_message[pos+=1] and char == ' ') || pos >= syslog_message.length
-        if char == ' '
-          time = DateTime.parse(syslog_message[anchor..pos])
-        end
-      end
-      anchor = pos+1
-      until (char = syslog_message[pos+=1] and char == ' ') || pos >= syslog_message.length
-        host = syslog_message[anchor..pos]
-      end
-      anchor = pos+1
-      until (char = syslog_message[pos+=1] and char == ' ') || pos >= syslog_message.length
-        token = syslog_message[anchor..pos]
-      end
-      anchor = pos+1
-      until (char = syslog_message[pos+=1] and char == ' ') || pos >= syslog_message.length
-        process = syslog_message[anchor..pos]
-      end
-      anchor = pos+1
-      until (char = syslog_message[pos+=1] and char == ' ') || pos >= syslog_message.length
-        message_id = syslog_message[anchor..pos]
-      end
-      anchor = pos+1
+    def self.extract_syslog_field(syslog_message, anchor)
+      start           = anchor
+      pos             = start
+      pos, bytes      = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
+      pos, facility   = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
+      pos, time       = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
+      pos, host       = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
+      pos, token      = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
+      pos, process    = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
+      pos, message_id = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
+
       limit = start + bytes + bytes.to_s.length
       message = syslog_message[anchor..limit]
+
       [limit + 1, { message: message, token: token }]
+    end
+
+    def self.next_syslog_field(message, anchor, pos)
+      until char = message[pos+=1] and char == ' '
+        field = message[anchor..pos].to_i
+      end
+      [pos, field]
     end
   end
 
@@ -85,7 +78,7 @@ class FakeLogplex
         @@received_messages.flatten!
         [200, {}, []]
       else
-        raise "wat"
+        [404, {}, []]
       end
     else
       [401, {}, []]

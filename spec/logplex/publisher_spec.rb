@@ -5,8 +5,7 @@ require 'support/fake_logplex'
 
 describe Logplex::Publisher, '#publish' do
   before do
-    host = URI.parse('https://logplex.example.com').hostname
-    ShamRack.mount(FakeLogplex.new, host, 443)
+    ShamRack.mount(FakeLogplex.new, 'logplex.example.com', 443)
   end
 
   after do
