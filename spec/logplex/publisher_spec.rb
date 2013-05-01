@@ -16,6 +16,7 @@ describe Logplex::Publisher, '#publish' do
   after do
     ShamRack.unmount_all
     FakeLogplex.clear!
+    restore_default_config
   end
 
   it 'encodes a message and publishes it' do

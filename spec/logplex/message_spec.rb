@@ -2,7 +2,8 @@ require 'spec_helper'
 require 'logplex/message'
 
 describe Logplex::Message do
-  before { Logplex.configure { |conf| } }
+  before { Logplex.configure {} }
+  after { restore_default_config }
   it 'fills out fields of a syslog message' do
     message = Logplex::Message.new(
       'my message here',
