@@ -2,18 +2,19 @@
 
 Publish and Consume Logplex messages
 
-Logplex is the Heroku log router, and can be found [here](https://github.com/heroku/logplex).
+Logplex is the Heroku log router, and can be found
+[here](https://github.com/heroku/logplex).
 
 ### Publishing messages
 
 ```ruby
 publisher = Logplex::Publisher.new(logplex_token, logplex_url)
-publisher.publish("This is a log entry", process: 'worker.2',
-                                         host:    'some-host')
+publisher.publish("There's a lady who's sure, all that glitters is gold",
+                   process: 'worker.2', host: 'some-host')
 ```
 
-Passing an array of messages to the `#publish` method will publish them all in one request,
-so some latency optimization is possible:
+Passing an array of messages to the `#publish` method will publish them all in
+one request, so some latency optimization is possible:
 
 ```ruby
 publisher.publish [ "And as we wind on down the road",
@@ -46,9 +47,8 @@ Logplex.configure do |config|
 end
 ```
 
-In the example above, it is now not not necessary to
-specify a logplex URL, process or host when getting
-a hold of a publisher and publishing messages:
+In the example above, it is now not not necessary to specify a logplex URL,
+process or host when getting a hold of a publisher and publishing messages:
 
 ```ruby
 publisher = Logplex::Publisher.new(logplex_token)
@@ -57,4 +57,5 @@ publisher.publish "And she's buying a stairway to heaven"
 
 ### License
 
-Copyright (c) Harold Giménez. Released under the terms of the MIT License found in the LICENSE file.
+Copyright (c) Harold Giménez. Released under the terms of the MIT License found
+in the LICENSE file.
