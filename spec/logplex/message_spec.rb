@@ -13,7 +13,7 @@ describe Logplex::Message do
     )
 
     expect(message.syslog_encode).to eq(
-      "89 <134>1 1980-08-23T05:31:00+00:00 some-host t.some-token heroku-postgres 1 my message here"
+      "91 <134>1 1980-08-23T05:31:00+00:00 some-host t.some-token heroku-postgres 1 - my message here"
     )
   end
 

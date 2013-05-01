@@ -9,17 +9,19 @@ module Logplex
     # syslog version 1
     FACILITY_AND_PRIORITY = '<134>1'.freeze
 
+    FIELD_DISABLED = '-'.freeze
+
     def initialize(message, opts = {})
       @message   = message
       @token      = opts.fetch(:token)
       @time       = opts[:time] || DateTime.now
       @process    = opts[:process] || 'postgres'
       @host       = opts[:host] || 'postgres'
-      @message_id = opts[:message_id] || '-'
+      @message_id = opts[:message_id] || FIELD_DISABLED
     end
 
     def syslog_encode
-      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@token} #{@process} #{@message_id} #{@message}"
+      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@token} #{@process} #{@message_id} #{FIELD_DISABLED} #{@message}"
       length = temp.length
       "#{length} #{temp}"
     end

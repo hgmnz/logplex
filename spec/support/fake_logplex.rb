@@ -37,6 +37,8 @@ class FakeLogplex
       anchor          = pos+1
       pos, message_id = next_syslog_field(syslog_message, anchor, pos)
       anchor          = pos+1
+      pos, unknown    = next_syslog_field(syslog_message, anchor, pos)
+      anchor          = pos+1
 
       limit = start + bytes + bytes.to_s.length
       message = syslog_message[anchor..limit]
