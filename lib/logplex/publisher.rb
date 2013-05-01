@@ -7,7 +7,7 @@ module Logplex
   class Publisher
     def initialize(token, logplex_url=nil)
       @token       = token
-      @logplex_url = logplex_url || 'https://logplex.heroku.com'
+      @logplex_url = logplex_url || 'https://east.logplex.io'
     end
 
     def publish(messages, opts={})
