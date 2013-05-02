@@ -48,6 +48,16 @@ describe Logplex::Publisher, '#publish' do
       expect(FakeLogplex.requests_received).to eq(1)
     end
 
+    it 'does the thing' do
+      FakeLogplex.register_token('t.some-token')
+
+      message = { hi: 'there' }
+      publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+      publisher.publish(message)
+
+      expect(FakeLogplex).to have_received_message('hi="there"')
+    end
+
     it 'returns true' do
       FakeLogplex.register_token('t.some-token')
 

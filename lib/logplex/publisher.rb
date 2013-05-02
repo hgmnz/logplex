@@ -16,13 +16,16 @@ module Logplex
     end
 
     def publish(messages, opts={})
-      messages = Array(messages).dup
-      messages.map! { |m| Message.new(m, opts.merge(token: @token)) }
-      messages.each(&:validate)
-      if messages.inject(true) { |accum, m| m.valid? }
+      message_list = messages.dup
+      unless messages.is_a? Array
+        message_list = [message_list]
+      end
+      message_list.map! { |m| Message.new(m, opts.merge(token: @token)) }
+      message_list.each(&:validate)
+      if message_list.inject(true) { |accum, m| m.valid? }
         begin
           Timeout::timeout(Logplex.configuration.publish_timeout) do
-            api_post(messages.map(&:syslog_frame).join(''))
+            api_post(message_list.map(&:syslog_frame).join(''))
             true
           end
         rescue *PUBLISH_ERRORS
