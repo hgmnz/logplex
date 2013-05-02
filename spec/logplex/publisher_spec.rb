@@ -77,4 +77,10 @@ describe Logplex::Publisher, '#publish' do
       expect(publisher.publish('hi')).to be_false
     end
   end
+
+  it "handles timeouts" do
+    RestClient.stub(:post).and_raise Timeout::Error
+    publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+    expect(publisher.publish('hi')).to be_false
+  end
 end

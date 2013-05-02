@@ -2,9 +2,14 @@
 require 'base64'
 require 'restclient'
 require 'logplex/message'
+require 'timeout'
 
 module Logplex
   class Publisher
+    PUBLISH_ERRORS = [RestClient::InternalServerError,
+                      RestClient::Unauthorized,
+                      Timeout::Error].freeze
+
     def initialize(token, logplex_url=nil)
       @token       = token
       @logplex_url = logplex_url || Logplex.configuration.logplex_url
@@ -16,9 +21,11 @@ module Logplex
       messages.each(&:validate)
       if messages.inject(true) { |accum, m| m.valid? }
         begin
-          api_post(messages.map(&:syslog_frame).join(''))
-          true
-        rescue RestClient::InternalServerError, RestClient::Unauthorized
+          Timeout::timeout(1) do
+            api_post(messages.map(&:syslog_frame).join(''))
+            true
+          end
+        rescue *PUBLISH_ERRORS
           false
         end
       end
