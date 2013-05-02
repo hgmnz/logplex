@@ -41,9 +41,10 @@ You can configure default values for logplex message posting:
 
 ```ruby
 Logplex.configure do |config|
-  config.logplex_url = 'https://logplex.example.com'
-  config.process     = 'stats'
-  config.host        = 'host'
+  config.logplex_url     = 'https://logplex.example.com'
+  config.process         = 'stats'
+  config.host            = 'host'
+  config.publish_timeout = 2
 end
 ```
 

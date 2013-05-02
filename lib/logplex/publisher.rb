@@ -21,7 +21,7 @@ module Logplex
       messages.each(&:validate)
       if messages.inject(true) { |accum, m| m.valid? }
         begin
-          Timeout::timeout(1) do
+          Timeout::timeout(Logplex.configuration.publish_timeout) do
             api_post(messages.map(&:syslog_frame).join(''))
             true
           end
