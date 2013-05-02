@@ -15,9 +15,12 @@ module Logplex
       messages.map! { |m| Message.new(m, opts.merge(token: @token)) }
       messages.each(&:validate)
       if messages.inject(true) { |accum, m| m.valid? }
-        api_post(
-          messages.map(&:syslog_frame).join('')
-        )
+        begin
+          api_post(messages.map(&:syslog_frame).join(''))
+          true
+        rescue RestClient::InternalServerError, RestClient::Unauthorized
+          false
+        end
       end
     end
 
