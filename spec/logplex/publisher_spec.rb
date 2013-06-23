@@ -14,7 +14,6 @@ describe Logplex::Publisher, '#publish' do
   context 'with a working logplex' do
     before do
       ShamRack.mount(FakeLogplex.new, 'logplex.example.com', 443)
-
     end
 
     after do

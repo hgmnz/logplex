@@ -1,4 +1,6 @@
-require "logplex/version"
 require "logplex/configuration"
+require "logplex/consumer"
+require "logplex/log"
 require "logplex/message"
 require "logplex/publisher"
+require "logplex/version"

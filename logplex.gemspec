@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.add_dependency "valcro"
   gem.add_dependency "rest-client"
+  gem.add_dependency "logfmt"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "sham_rack"
 end

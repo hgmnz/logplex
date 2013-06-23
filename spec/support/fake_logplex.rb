@@ -79,6 +79,13 @@ class FakeLogplex
         @@received_messages << Message.from_syslog(message)
         @@received_messages.flatten!
         [200, {}, []]
+      elsif (method == 'POST' &&
+             path = '/v2/sessions' &&
+             content_length == message.length)
+        [200, {}, [{url: "/sessions/9d53bf70-7964-4429-a589-aaa4df86fead"}.to_json]]
+      elsif (method == 'GET' &&
+             path == '/sessions/9d53bf70-7964-4429-a589-aaa4df86fead')
+        [200, {}, ["2012-12-10T03:00:48Z+00:00 app[console.1]: test message 1"]]
       else
         [404, {}, []]
       end
