@@ -1,18 +1,17 @@
 # encoding: UTF-8
-require 'base64'
-require 'restclient'
+require 'excon'
 require 'logplex/message'
 require 'timeout'
 
 module Logplex
   class Publisher
-    PUBLISH_ERRORS = [RestClient::InternalServerError,
-                      RestClient::Unauthorized,
+    PUBLISH_ERRORS = [Excon::Errors::InternalServerError,
+                      Excon::Errors::Unauthorized,
                       Timeout::Error].freeze
 
-    def initialize(token, logplex_url=nil)
-      @token       = token
+    def initialize(logplex_url = nil)
       @logplex_url = logplex_url || Logplex.configuration.logplex_url
+      @token = URI(logplex_url).password || Logplex.configuration.app_name
     end
 
     def publish(messages, opts={})
@@ -20,7 +19,7 @@ module Logplex
       unless messages.is_a? Array
         message_list = [message_list]
       end
-      message_list.map! { |m| Message.new(m, opts.merge(token: @token)) }
+      message_list.map! { |m| Message.new(m, opts.merge(app_name: @token)) }
       message_list.each(&:validate)
       if message_list.inject(true) { |accum, m| m.valid? }
         begin
@@ -37,12 +36,10 @@ module Logplex
     private
 
     def api_post(message)
-      auth_token = Base64.encode64("token:#{@token}")
-      auth = "Basic #{auth_token}"
-      RestClient.post(logplex_url, message,
-                      content_type: 'application/logplex-1',
-                      content_length: message.length,
-                      authorization: auth)
+      Excon.post(@logplex_url, body: message, headers: {
+        "Content-Type" => 'application/logplex-1',
+        "Content-Length" => message.length,
+      }, expects: [200])
     end
   end
 end

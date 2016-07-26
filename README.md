@@ -8,7 +8,7 @@ Logplex is the Heroku log router, and can be found
 ### Publishing messages
 
 ```ruby
-publisher = Logplex::Publisher.new(logplex_token, logplex_url)
+publisher = Logplex::Publisher.new(logplex_url)
 publisher.publish("There's a lady who's sure, all that glitters is gold",
                    process: 'worker.2', host: 'some-host')
 ```
@@ -31,7 +31,8 @@ eg: [log2viz](https://blog.heroku.com/archives/2013/3/19/log2viz)
 publisher.publish { vocals: 'Robert Plant', guitar: 'Jimmy Page' }
 # produces the message: vocals='Robert Plant' guitar='Jimmy Page'
 ```
-### Consumnig messages
+
+### Consuming messages
 
 TBD
 
@@ -41,7 +42,7 @@ You can configure default values for logplex message posting:
 
 ```ruby
 Logplex.configure do |config|
-  config.logplex_url     = 'https://logplex.example.com'
+  config.logplex_url     = 'https://logplex.example.com/logs'
   config.process         = 'stats'
   config.host            = 'host'
   config.publish_timeout = 2
@@ -52,7 +53,7 @@ In the example above, it is now not not necessary to specify a logplex URL,
 process or host when getting a hold of a publisher and publishing messages:
 
 ```ruby
-publisher = Logplex::Publisher.new(logplex_token)
+publisher = Logplex::Publisher.new
 publisher.publish "And she's buying a stairway to heaven"
 ```
 

@@ -7,7 +7,7 @@ describe Logplex::Message do
   it 'fills out fields of a syslog message' do
     message = Logplex::Message.new(
       'my message here',
-      token: 't.some-token',
+      app_name: 't.some-token',
       time: DateTime.parse("1980-08-23 05:31 00:00"),
       process: 'heroku-postgres',
       host: 'some-host',
@@ -20,17 +20,17 @@ describe Logplex::Message do
   end
 
   it 'is invalid for messages longer than 10240 bytes' do
-    short = Logplex::Message.new('a' * 10240, token:   'foo',
+    short = Logplex::Message.new('a' * 10240, app_name:   'foo',
                                               process: 'proc',
                                               host:    'host')
-    long  = Logplex::Message.new('a' * 10241, token: 'foo',
+    long  = Logplex::Message.new('a' * 10241, app_name: 'foo',
                                               process: 'proc',
                                               host:    'host')
     short.validate
     long.validate
 
-    expect(short.valid?).to be_true
-    expect(long.valid?).to be_false
+    expect(short.valid?).to be_truthy
+    expect(long.valid?).to be_falsey
   end
 
   it 'is invalid with no process or host' do
@@ -39,10 +39,10 @@ describe Logplex::Message do
       conf.process = nil
     end
 
-    message = Logplex::Message.new("a message", token: 't.some-token')
+    message = Logplex::Message.new("a message", app_name: 't.some-token')
     message.validate
 
-    expect(message.valid?).to be_false
+    expect(message.valid?).to be_falsey
     expect(message.errors[:process]).to eq ["can't be nil"]
     expect(message.errors[:host]).to eq ["can't be nil"]
   end
@@ -50,7 +50,7 @@ describe Logplex::Message do
   it 'formats logs as key/values when given a hash' do
     message = Logplex::Message.new(
       { vocals: 'Robert Plant', guitar: 'Jimmy Page' },
-      token: 't.some-token',
+      app_name: 't.some-token',
       process: 'proc',
       host:    'host',
       time: DateTime.parse("1980-08-23 05:31 00:00")

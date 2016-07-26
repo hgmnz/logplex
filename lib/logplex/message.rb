@@ -14,7 +14,7 @@ module Logplex
 
     def initialize(message, opts = {})
       @message    = message
-      @token      = opts.fetch(:token)
+      @app_name   = opts[:app_name] || Logplex.configuration.app_name
       @time       = opts[:time] || DateTime.now
       @process    = opts[:process] || Logplex.configuration.process
       @host       = opts[:host] || Logplex.configuration.host
@@ -22,7 +22,7 @@ module Logplex
     end
 
     def syslog_frame
-      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@token} #{@process} #{@message_id} #{FIELD_DISABLED} #{formatted_message}"
+      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@app_name} #{@process} #{@message_id} #{FIELD_DISABLED} #{formatted_message}"
       length = temp.length
       "#{length} #{temp}"
     end

@@ -8,7 +8,7 @@ describe Logplex::Configuration do
 
       expect(
         Logplex.configuration.logplex_url
-      ).to eq('https://east.logplex.io')
+      ).to eq('https://east.logplex.io/logs')
     end
   end
 end

@@ -1,97 +1,76 @@
 require 'spec_helper'
-require 'sham_rack'
 require 'logplex/publisher'
-require 'support/fake_logplex'
 
 describe Logplex::Publisher do
   describe '#publish' do
     before do
+      Excon.defaults[:mock] = true
       Logplex.configure do |config|
         config.process = "postgres"
         config.host = "host"
       end
     end
 
-    context 'with a working logplex' do
-      before do
-        ShamRack.mount(FakeLogplex.new, 'logplex.example.com', 443)
-      end
+    after do
+      Excon.stubs.clear
+    end
 
+    context 'with a working logplex' do
       after do
-        ShamRack.unmount_all
-        FakeLogplex.clear!
         restore_default_config
       end
 
       it 'encodes a message and publishes it' do
-        FakeLogplex.register_token('t.some-token')
-
+        Excon.stub({ method: :post, password: "t.some-token", body: /message for you/ }, status: 200)
         message = 'I have a message for you'
-        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
         publisher.publish(message)
-
-        expect(FakeLogplex).to have_received_message(message)
       end
 
       it 'sends many messages in one request when passed an array' do
-        FakeLogplex.register_token('t.some-token')
+        Excon.stub({ method: :post, password: "t.some-token", body: /here is another/ }, status: 200)
+        expect(Excon).to receive(:post).once
         messages = ['I have a message for you', 'here is another', 'some final thoughts']
 
-        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
 
         publisher.publish(messages)
-
-        messages.each do |message|
-          expect(FakeLogplex).to have_received_message(message)
-        end
-
-        expect(FakeLogplex.requests_received).to eq(1)
       end
 
       it 'does the thing' do
-        FakeLogplex.register_token('t.some-token')
-
+        Excon.stub({ method: :post, password: "t.some-token", body: /hi\="there\"/ }, status: 200)
         message = { hi: 'there' }
-        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-        publisher.publish(message)
-
-        expect(FakeLogplex).to have_received_message('hi="there"')
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
+        expect(publisher.publish(message)).to be_truthy
       end
 
       it 'returns true' do
-        FakeLogplex.register_token('t.some-token')
-
+        Excon.stub({ method: :post, password: "t.some-token" }, status: 200)
         message = 'I have a message for you'
-        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-        expect(publisher.publish(message)).to be_true
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
+        expect(publisher.publish(message)).to be_truthy
       end
 
       it "returns false when there's an auth error" do
+        Excon.stub({ method: :post, password: "t.some-token" }, status: 401)
         message = 'I have a message for you'
-        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-        expect(publisher.publish(message)).to be_false
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
+        expect(publisher.publish(message)).to be_falsey
       end
     end
 
     context 'when the logplex service is acting up' do
-      before do
-        ShamRack.at('logplex.example.com', 443) do
-          [500, {}, []]
-        end
-      end
-
-      after { ShamRack.unmount_all }
-
       it 'returns false' do
-        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-        expect(publisher.publish('hi')).to be_false
+        Excon.stub({ method: :post, password: "t.some-token" }, status: 500)
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
+        expect(publisher.publish('hi')).to be_falsey
       end
     end
 
     it "handles timeouts" do
-      RestClient.stub(:post).and_raise Timeout::Error
-      publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-      expect(publisher.publish('hi')).to be_false
+      expect(Excon).to receive(:post).and_raise(Timeout::Error)
+      publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
+      expect(publisher.publish('hi')).to be_falsey
     end
   end
 end
