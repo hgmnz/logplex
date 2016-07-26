@@ -21,14 +21,14 @@ describe Logplex::Publisher do
       end
 
       it 'encodes a message and publishes it' do
-        Excon.stub({ method: :post, password: "t.some-token", body: /message for you/ }, status: 200)
+        Excon.stub({ method: :post, password: "t.some-token", body: /message for you/ }, status: 204)
         message = 'I have a message for you'
         publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
         publisher.publish(message)
       end
 
       it 'sends many messages in one request when passed an array' do
-        Excon.stub({ method: :post, password: "t.some-token", body: /here is another/ }, status: 200)
+        Excon.stub({ method: :post, password: "t.some-token", body: /here is another/ }, status: 204)
         expect(Excon).to receive(:post).once
         messages = ['I have a message for you', 'here is another', 'some final thoughts']
 
@@ -38,14 +38,14 @@ describe Logplex::Publisher do
       end
 
       it 'does the thing' do
-        Excon.stub({ method: :post, password: "t.some-token", body: /hi\="there\"/ }, status: 200)
+        Excon.stub({ method: :post, password: "t.some-token", body: /hi\="there\"/ }, status: 204)
         message = { hi: 'there' }
         publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
         expect(publisher.publish(message)).to be_truthy
       end
 
       it 'returns true' do
-        Excon.stub({ method: :post, password: "t.some-token" }, status: 200)
+        Excon.stub({ method: :post, password: "t.some-token" }, status: 204)
         message = 'I have a message for you'
         publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
         expect(publisher.publish(message)).to be_truthy

@@ -11,7 +11,7 @@ module Logplex
 
     def initialize(logplex_url = nil)
       @logplex_url = logplex_url || Logplex.configuration.logplex_url
-      @token = URI(logplex_url).password || Logplex.configuration.app_name
+      @token = URI(@logplex_url).password || Logplex.configuration.app_name
     end
 
     def publish(messages, opts={})
@@ -39,7 +39,7 @@ module Logplex
       Excon.post(@logplex_url, body: message, headers: {
         "Content-Type" => 'application/logplex-1',
         "Content-Length" => message.length,
-      }, expects: [200])
+      }, expects: [200, 204])
     end
   end
 end
