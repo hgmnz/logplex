@@ -24,7 +24,7 @@ module Logplex
       message_list.each(&:validate)
       if message_list.inject(true) { |accum, m| m.valid? }
         begin
-          Timeout::timeout(Logplex.configuration.publish_timeout) do
+          Timeout.timeout(Logplex.configuration.publish_timeout) do
             api_post(message_list.map(&:syslog_frame).join(''))
             true
           end
@@ -34,11 +34,12 @@ module Logplex
       end
     end
 
-  private
+    private
+
     def api_post(message)
       auth_token = Base64.encode64("token:#{@token}")
       auth = "Basic #{auth_token}"
-      RestClient.post("#{@logplex_url}/logs", message,
+      RestClient.post(logplex_url, message,
                       content_type: 'application/logplex-1',
                       content_length: message.length,
                       authorization: auth)

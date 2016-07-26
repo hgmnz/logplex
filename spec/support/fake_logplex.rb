@@ -1,6 +1,5 @@
 class FakeLogplex
   class Message
-
     attr_reader :message, :token
 
     def initialize(opts)
@@ -105,4 +104,3 @@ class FakeLogplex
     @@requests_received
   end
 end
-

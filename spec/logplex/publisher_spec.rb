@@ -3,94 +3,95 @@ require 'sham_rack'
 require 'logplex/publisher'
 require 'support/fake_logplex'
 
-describe Logplex::Publisher, '#publish' do
-  before do
-    Logplex.configure do |config|
-      config.process = "postgres"
-      config.host = "host"
-    end
-  end
-
-  context 'with a working logplex' do
+describe Logplex::Publisher do
+  describe '#publish' do
     before do
-      ShamRack.mount(FakeLogplex.new, 'logplex.example.com', 443)
-
+      Logplex.configure do |config|
+        config.process = "postgres"
+        config.host = "host"
+      end
     end
 
-    after do
-      ShamRack.unmount_all
-      FakeLogplex.clear!
-      restore_default_config
-    end
+    context 'with a working logplex' do
+      before do
+        ShamRack.mount(FakeLogplex.new, 'logplex.example.com', 443)
+      end
 
-    it 'encodes a message and publishes it' do
-      FakeLogplex.register_token('t.some-token')
+      after do
+        ShamRack.unmount_all
+        FakeLogplex.clear!
+        restore_default_config
+      end
 
-      message = 'I have a message for you'
-      publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-      publisher.publish(message)
+      it 'encodes a message and publishes it' do
+        FakeLogplex.register_token('t.some-token')
 
-      expect(FakeLogplex).to have_received_message(message)
-    end
+        message = 'I have a message for you'
+        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+        publisher.publish(message)
 
-    it 'sends many messages in one request when passed an array' do
-      FakeLogplex.register_token('t.some-token')
-      messages = ['I have a message for you', 'here is another', 'some final thoughts']
-
-      publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-
-      publisher.publish(messages)
-
-      messages.each do |message|
         expect(FakeLogplex).to have_received_message(message)
       end
 
-      expect(FakeLogplex.requests_received).to eq(1)
-    end
+      it 'sends many messages in one request when passed an array' do
+        FakeLogplex.register_token('t.some-token')
+        messages = ['I have a message for you', 'here is another', 'some final thoughts']
 
-    it 'does the thing' do
-      FakeLogplex.register_token('t.some-token')
+        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
 
-      message = { hi: 'there' }
-      publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-      publisher.publish(message)
+        publisher.publish(messages)
 
-      expect(FakeLogplex).to have_received_message('hi="there"')
-    end
+        messages.each do |message|
+          expect(FakeLogplex).to have_received_message(message)
+        end
 
-    it 'returns true' do
-      FakeLogplex.register_token('t.some-token')
+        expect(FakeLogplex.requests_received).to eq(1)
+      end
 
-      message = 'I have a message for you'
-      publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-      expect(publisher.publish(message)).to be_true
-    end
+      it 'does the thing' do
+        FakeLogplex.register_token('t.some-token')
 
-    it "returns false when there's an auth error" do
-      message = 'I have a message for you'
-      publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-      expect(publisher.publish(message)).to be_false
-    end
-  end
+        message = { hi: 'there' }
+        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+        publisher.publish(message)
 
-  context 'when the logplex service is acting up' do
-    before do
-      ShamRack.at('logplex.example.com', 443) do
-        [500, {}, []]
+        expect(FakeLogplex).to have_received_message('hi="there"')
+      end
+
+      it 'returns true' do
+        FakeLogplex.register_token('t.some-token')
+
+        message = 'I have a message for you'
+        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+        expect(publisher.publish(message)).to be_true
+      end
+
+      it "returns false when there's an auth error" do
+        message = 'I have a message for you'
+        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+        expect(publisher.publish(message)).to be_false
       end
     end
 
-    after { ShamRack.unmount_all }
+    context 'when the logplex service is acting up' do
+      before do
+        ShamRack.at('logplex.example.com', 443) do
+          [500, {}, []]
+        end
+      end
 
-    it 'returns false' do
+      after { ShamRack.unmount_all }
+
+      it 'returns false' do
+        publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
+        expect(publisher.publish('hi')).to be_false
+      end
+    end
+
+    it "handles timeouts" do
+      RestClient.stub(:post).and_raise Timeout::Error
       publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
       expect(publisher.publish('hi')).to be_false
     end
-  end
-
-  it "handles timeouts" do
-    RestClient.stub(:post).and_raise Timeout::Error
-    publisher = Logplex::Publisher.new('t.some-token', 'https://logplex.example.com')
-    expect(publisher.publish('hi')).to be_false
   end
 end

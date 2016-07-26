@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Logplex::VERSION
   gem.authors       = ["Harold Giménez"]
   gem.email         = ["harold.gimenez@gmail.com"]
-  gem.description   = %q{Publish and Consume Logplex messages}
-  gem.summary       = %q{Publish and Consume Logplex messages}
+  gem.description   = "Publish and Consume Logplex messages"
+  gem.summary       = "Publish and Consume Logplex messages"
   gem.homepage      = "https://practiceovertheory.com"
 
   gem.files         = `git ls-files`.split($/)
@@ -17,7 +17,6 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.add_dependency "valcro"
-  gem.add_dependency "rest-client"
+  gem.add_dependency "excon"
   gem.add_development_dependency "rspec"
-  gem.add_development_dependency "sham_rack"
 end

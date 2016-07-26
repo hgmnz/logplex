@@ -13,7 +13,7 @@ module Logplex
     FIELD_DISABLED = '-'.freeze
 
     def initialize(message, opts = {})
-      @message   = message
+      @message    = message
       @token      = opts.fetch(:token)
       @time       = opts[:time] || DateTime.now
       @process    = opts[:process] || Logplex.configuration.process
@@ -34,7 +34,8 @@ module Logplex
       errors.add(:host, "can't be nil") if @host.nil?
     end
 
-  private
+    private
+
     def formatted_time
       case @time.class
       when String
@@ -45,7 +46,7 @@ module Logplex
     end
 
     def formatted_message
-      if @message.kind_of?(Hash)
+      if @message.is_a?(Hash)
         @message.inject([]) do |res, (key, value)|
           res << %{#{key}="#{value}"}
         end.join(' ')
@@ -53,6 +54,5 @@ module Logplex
         @message
       end
     end
-
   end
 end
