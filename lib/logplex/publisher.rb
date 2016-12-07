@@ -39,6 +39,7 @@ module Logplex
       Excon.post(@logplex_url, body: message, headers: {
         "Content-Type" => 'application/logplex-1',
         "Content-Length" => message.length,
+        "Logplex-Msg-Count" => '1'
       }, expects: [200, 204])
     end
   end

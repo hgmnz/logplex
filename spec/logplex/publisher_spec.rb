@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'logplex/publisher'
+require 'logplex/message'
 
 describe Logplex::Publisher do
   describe '#publish' do
@@ -71,6 +72,17 @@ describe Logplex::Publisher do
       expect(Excon).to receive(:post).and_raise(Timeout::Error)
       publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
       expect(publisher.publish('hi')).to be_falsey
+    end
+
+    it "includes the correct headers" do
+      message = 'hello-harold'
+      headers = {
+        "Content-Type" => 'application/logplex-1',
+        "Content-Length" => 79,
+        "Logplex-Msg-Count" => '1'
+      }
+      expect(Excon).to receive(:post).with(any_args, hash_including(:headers => headers))
+      Logplex::Publisher.new('https://token:t.some-token@logplex.example.com').publish(message)
     end
   end
 end
