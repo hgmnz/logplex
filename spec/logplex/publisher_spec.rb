@@ -79,7 +79,7 @@ describe Logplex::Publisher do
       headers = {
         "Content-Type" => 'application/logplex-1',
         "Content-Length" => 79,
-        "Logplex-Msg-Count" => '1'
+        "Logplex-Msg-Count" => 1
       }
       expect(Excon).to receive(:post).with(any_args, hash_including(:headers => headers))
       Logplex::Publisher.new('https://token:t.some-token@logplex.example.com').publish(message)

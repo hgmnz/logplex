@@ -24,7 +24,7 @@ module Logplex
       if message_list.inject(true) { |accum, m| m.valid? }
         begin
           Timeout.timeout(Logplex.configuration.publish_timeout) do
-            api_post(message_list.map(&:syslog_frame).join(''))
+            api_post(message_list.map(&:syslog_frame).join(''), message_list.length)
             true
           end
         rescue *PUBLISH_ERRORS
@@ -35,11 +35,11 @@ module Logplex
 
     private
 
-    def api_post(message)
+    def api_post(message, number_messages)
       Excon.post(@logplex_url, body: message, headers: {
         "Content-Type" => 'application/logplex-1',
         "Content-Length" => message.length,
-        "Logplex-Msg-Count" => '1'
+        "Logplex-Msg-Count" => number_messages
       }, expects: [200, 204])
     end
   end
