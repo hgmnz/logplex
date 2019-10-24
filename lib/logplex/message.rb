@@ -22,7 +22,7 @@ module Logplex
     end
 
     def syslog_frame
-      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@app_name} #{@process} #{@message_id} #{FIELD_DISABLED} #{formatted_message}"
+      temp = "#{FACILITY_AND_PRIORITY} #{formatted_time} #{@host} #{@app_name} #{@process} #{@message_id} #{formatted_message}"
       length = temp.length
       "#{length} #{temp}"
     end

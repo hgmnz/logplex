@@ -78,7 +78,7 @@ describe Logplex::Publisher do
       message = 'hello-harold'
       headers = {
         "Content-Type" => 'application/logplex-1',
-        "Content-Length" => 79,
+        "Content-Length" => 77,
         "Logplex-Msg-Count" => 1
       }
       expect(Excon).to receive(:post).with(any_args, hash_including(:headers => headers))
