@@ -29,13 +29,24 @@ describe Logplex::Publisher do
       end
 
       it 'sends many messages in one request when passed an array' do
-        Excon.stub({ method: :post, password: "t.some-token", body: /here is another/ }, status: 204)
-        expect(Excon).to receive(:post).once
+        Excon.stub({ method: :post, password: "t.some-token", body: /message for you.+here is another.+some final thoughts/ }, status: 204)
         messages = ['I have a message for you', 'here is another', 'some final thoughts']
-
         publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
-
         publisher.publish(messages)
+      end
+
+      it 'uses the token if app_name is not given' do
+        Excon.stub({ method: :post, password: "t.some-token", body: /t.some-token/ }, status: 204)
+        message = 'I have a message for you'
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
+        publisher.publish(message)
+      end
+
+      it 'uses the given app_name' do
+        Excon.stub({ method: :post, password: "t.some-token", body: /foo/ }, status: 204)
+        message = 'I have a message for you'
+        publisher = Logplex::Publisher.new('https://token:t.some-token@logplex.example.com')
+        publisher.publish(message, app_name: 'foo')
       end
 
       it 'does the thing' do

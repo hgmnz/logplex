@@ -19,7 +19,7 @@ module Logplex
       unless messages.is_a? Array
         message_list = [message_list]
       end
-      message_list.map! { |m| Message.new(m, opts.merge(app_name: @token)) }
+      message_list.map! { |m| Message.new(m, { app_name: @token }.merge(opts)) }
       message_list.each(&:validate)
       if message_list.inject(true) { |accum, m| m.valid? }
         begin
